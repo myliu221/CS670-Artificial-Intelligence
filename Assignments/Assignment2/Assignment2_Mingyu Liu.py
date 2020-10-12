@@ -61,7 +61,26 @@ def slide_expand(state, goal):
   
 # TO DO: Return either the solution as a list of states from start to goal or [] if there is no solution.               
 def a_star(start, goal, expand):
-    return []
+    (height, width) = start.shape
+    mismatch_count = 0
+    for i in range(height):
+        for j in range(width):
+            if start[i ,j] > 0 and start[i, j] != goal[i, j]:
+                mismatch_count += 1
+    good_state=(start, mismatch_count)
+    good_state_list = []
+    good_state_list.append(good_state[0])
+    compare_array = np.array_equal(good_state[0], goal)
+    while not compare_array:
+#    for i in range(5):
+        node_list = slide_expand(good_state[0], goal)
+        good_state = node_list[0]
+        for i in range(len(node_list)):
+            if node_list[i][1] < good_state[1]:
+                good_state = node_list[i]        
+        compare_array = np.array_equal(good_state[0], goal)
+        good_state_list.append(good_state[0])
+    return good_state_list
 
 # Find and print a solution for a given slide puzzle, i.e., the states we need to go through 
 # in order to get from the start state to the goal state.
