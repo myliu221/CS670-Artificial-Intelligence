@@ -62,25 +62,54 @@ def slide_expand(state, goal):
 # TO DO: Return either the solution as a list of states from start to goal or [] if there is no solution.               
 def a_star(start, goal, expand):
     (height, width) = start.shape
+    #calculate h'-score of start state
     mismatch_count = 0
     for i in range(height):
         for j in range(width):
             if start[i ,j] > 0 and start[i, j] != goal[i, j]:
                 mismatch_count += 1
-    good_state=(start, mismatch_count)
-    good_state_list = []
-    good_state_list.append(good_state[0])
-    compare_array = np.array_equal(good_state[0], goal)
+    #save start state and its h'-score into good_state_pair
+    good_state_pair = (start, mismatch_count)
+    #save start state array into good_state
+    good_state = [good_state_pair[0]]
+    #compare start state and goal
+    compare_array = np.array_equal(good_state_pair[0], goal)
+    #check whether reach the goal state
     while not compare_array:
-#    for i in range(5):
-        node_list = slide_expand(good_state[0], goal)
-        good_state = node_list[0]
+        #create all states that can be reached from the current state and return state and h'-score
+        node_list = slide_expand(good_state_pair[0], goal) 
+        #check new states and delete same states as ancestors to avoid a search cycle
+        node_list_del = []
         for i in range(len(node_list)):
-            if node_list[i][1] < good_state[1]:
-                good_state = node_list[i]        
-        compare_array = np.array_equal(good_state[0], goal)
-        good_state_list.append(good_state[0])
-    return good_state_list
+            for j in range(len(good_state)):
+                if np.array_equal(node_list[i][0],good_state[j]):
+                    node_list_del.append(i)
+        for i in node_list_del:
+            del node_list[i] 
+        # if node_list is empty, which means all the new states are same as ancestors, then stop searching and return empty list
+        if len(node_list) == 0:
+            return []
+        # good_state_pair = node_list[0]
+        # for i in range(len(node_list)): 
+        #     if node_list[i][1] < good_state_pair[1]: 
+        #         good_state_pair = node_list[i]
+        #     elif node_list[i][1] == good_state_pair[1]:
+        #         node_list1 = slide_expand(node_list[i][0], goal) 
+        #         node_list2 = slide_expand(good_state_pair[0], goal)         
+        
+        #sort h'-score of the list of open nodes
+        for i in range(0, len(node_list)):           
+            for j in range(0, len(node_list)-i-1):  
+                if (node_list[j][1] > node_list[j + 1][1]):  
+                    a = node_list[j]  
+                    node_list[j]= node_list[j + 1]  
+                    node_list[j + 1]= a         
+        # choose the smallest h'-score for next round
+        good_state_pair = node_list[0]
+        compare_array = np.array_equal(good_state_pair[0], goal)
+        # add the current good state into good_state
+        good_state.append(good_state_pair[0])
+    return good_state
 
 # Find and print a solution for a given slide puzzle, i.e., the states we need to go through 
 # in order to get from the start state to the goal state.
