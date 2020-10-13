@@ -72,10 +72,10 @@ def a_star(start, goal, expand):
     (height, width) = start.shape
     #calculate h'-score of start state
     mismatch_count = 0
-    for i in range(height):
-        for j in range(width):
-            if start[i ,j] > 0 and start[i, j] != goal[i, j]:
-                mismatch_count += 1
+    # for i in range(height):
+    #     for j in range(width):
+    #         if start[i ,j] > 0 and start[i, j] != goal[i, j]:
+    #             mismatch_count += 1
     #save start state and its h'-score into open_list
     open_list = [([start],mismatch_count)]
     #compare start state and goal
@@ -147,7 +147,7 @@ def slide_solver(start, goal):
             print(space + '|')
             print(space + 'V')
 
-slide_solver(example_1_start, example_1_goal)       # Find solution to example_1
+#slide_solver(example_1_start, example_1_goal)       # Find solution to example_1
 
 
 
@@ -161,13 +161,16 @@ def make_node_improved(state, row_from, col_from, row_to, col_to, goal):
     new_state[row_from, col_from] = 0
     
     # Count the mismatched numbers and use this value as the h'-score (estimated number of moves needed to reach the goal).
-    mismatch_count = 0
-    for i in range(height):
-        for j in range(width):
-            if new_state[i ,j] > 0 and new_state[i, j] != goal[i, j]:
-                mismatch_count += 1
-   
-    return (new_state, mismatch_count)
+    distance_sum = 0
+    new_state_list = list(new_state.flatten())
+    goal_state_list = list(goal.flatten())
+    for i in new_state_list:
+        new_index = new_state_list.index(i)
+        goal_index = goal_state_list.index(i)
+        new_i, new_j = new_index // int(np.sqrt(len(new_state_list))), new_index % int(np.sqrt(len(new_state_list)))
+        goal_i, goal_j = goal_index // int(np.sqrt(len(goal_state_list))), goal_index % int(np.sqrt(len(goal_state_list)))
+        distance_sum += abs(new_i - goal_i) + abs(new_j- goal_j)
+    return (new_state, distance_sum)
 
 # For given current state and goal state, create all states that can be reached from the current state
 # (i.e., expand the current node in the search tree) and return a list that contains a pair (state, h'-score)
@@ -219,5 +222,5 @@ def slide_solver_improved(start, goal):
             print(space + 'V')
 
 
-
+slide_solver_improved(example_2_start, example_2_goal) 
 
